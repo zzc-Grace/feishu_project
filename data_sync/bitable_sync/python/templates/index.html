@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建群组</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: #fff;
+            padding: 100px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>创建群组</h1>
+        <input type="text" id="group_name" placeholder="输入群名">
+        <textarea id="group_description" placeholder="输入群组描述" rows="3"></textarea>
+        <button onclick="createGroup()">创建群组</button>
+        <textarea id="content" placeholder="输入发送内容" rows="3"></textarea>
+        <button onclick="sendMessage()">发送消息</button>
+        <button onclick="getMessage()">查看消息</button>
+
+        <table id="jsonTable">
+            <thead>
+                <tr>
+                    <th>消息内容</th>
+                    <th>消息类型</th>
+                    <th>发送者</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function createGroup() {
+            const groupName = document.getElementById('group_name').value;
+            const groupDescription = document.getElementById('group_description').value;
+            
+            fetch('/create_group', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ group_name: groupName, group_description: groupDescription })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('创建群组时出错');
+            });
+        }
+
+
+        function sendMessage() {
+            const content = document.getElementById('content').value;
+            
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: content })
+            })
+            .then(response => response.json())
+            .then(jsonData => {
+                const tableBody = document.getElementById("jsonTable").getElementsByTagName("tbody")[0];
+                tableBody.innerHTML = "";
+
+                // 遍历 JSON 数据并生成表格行
+                jsonData.forEach(item => {
+                    const row = tableBody.insertRow();
+                    
+                    const contentCell = row.insertCell(0);
+                    contentCell.textContent = item.content;
+
+                    const typeCell = row.insertCell(1);
+                    typeCell.textContent = item.type;
+
+                    const roleCell = row.insertCell(2);
+                    roleCell.textContent = item.role;
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发送消息失败');
+            });
+        }
+        function getMessage() {
+            
+            fetch('/get_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify()
+            })
+            .then(response => response.json())
+            .then(jsonData => {
+                const tableBody = document.getElementById("jsonTable").getElementsByTagName("tbody")[0];
+                tableBody.innerHTML = "";
+
+                // 遍历 JSON 数据并生成表格行
+                jsonData.forEach(item => {
+                    const row = tableBody.insertRow();
+                    
+                    const contentCell = row.insertCell(0);
+                    contentCell.textContent = item.content;
+
+                    const typeCell = row.insertCell(1);
+                    typeCell.textContent = item.type;
+
+                    const roleCell = row.insertCell(2);
+                    roleCell.textContent = item.role;
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('获取消息失败');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[
+    {
+        "type": "instruct",
+        "role": "robot",
+        "content": "# 11"
+    },
+    {
+        "type": "common",
+        "role": "robot",
+        "content": "22"
+    }
+]
